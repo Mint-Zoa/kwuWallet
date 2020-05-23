@@ -1,4 +1,4 @@
-### kwuWallet - Ethereum Wallet of kwu token for Python
+# kwuWallet - Ethereum Wallet of kwu token for Python
 
 Welcome to kwuWallet - Ethereum Wallet of kwu token !
 
