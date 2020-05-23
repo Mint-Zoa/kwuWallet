@@ -1,0 +1,13 @@
+[Unit]
+Description = uWSGI instance to serve kwu.
+After = network.target
+
+[Service]
+User = root
+Group = www-data
+WorkingDirectory = /home/ubuntu/kwu/backend
+Environment = "PATH=/home/ubuntu/kwu/backend/venv/bin"
+ExecStart = /home/ubuntu/kwu/backend/venv/bin/uwsgi --ini kwu.ini
+
+[Install]
+WantedBy = multi-user.target

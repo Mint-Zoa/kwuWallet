@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>kwu</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/cover/">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+  <link rel="stylesheet" href="build/css/intlTelInput.css">
+  <link rel="stylesheet" href="build/css/demo.css">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .iti {
+        color: #0e0e0e;
+      }
+
+      button {
+        font-size: 15px;
+        background-color: #C5C6C7;
+        border: 0;
+        width: 80%;
+        padding: 5px;
+        text-align: center;
+        color: #1F2833;
+        font-weight: bold;
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="cover.css" rel="stylesheet">
+
+    <script>
+        if (sessionStorage.accessToken == null) {
+            window.location.href = "login.html"
+        }
+    </script>
+  </head>
+  <body class="text-center">
+
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="masthead mb-auto">
+    <div class="inner">
+      <h3 class="masthead-brand">kwu Wallet</h3>
+      <nav class="nav nav-masthead justify-content-center">
+        <a id="deposit" class="nav-link" href="index.html">Deposit</a>
+        <a id="withdraw" class="nav-link active" href="withdraw.html">Withdraw</a>
+      </nav>
+    </div>
+  </header>
+
+  <div>
+  <main role="main" class="inner cover">
+    <h3 class="cover-heading">ATCG</h3>
+
+    <div class="lead" style="display:inline-block;">
+    <input type="email" id="atcg_to" class="form-control" placeholder="to">
+    <div style="height: 5px;"></div>
+    <input type="email" id="atcg_amount" class="form-control" placeholder="amount">
+    <div style="height: 5px;"></div>
+    <input id="phone" name="phone" class="form-control" type="tel">
+    <div id="sms_send_spacer" style="height: 5px;"></div>
+    <button id="sms_send">Send SMS</button>
+    <input id="sms_code" class="form-control" placeholder="SMS Verification Code" type="text">
+    <p id="ticket"></p>
+    </div>
+    <br><br>
+    <p class="lead">
+      <a id="atcg_send" href="#" class="btn btn-lg btn-secondary">Transact Examine</a>
+    </p>
+  </main>
+<br>
+  <main role="main" class="inner cover">
+    <h3 class="cover-heading">ETH</h3>
+
+    <div class="lead" style="display:inline-block;">
+    <input type="email" id="eth_to" class="form-control" placeholder="to">
+    <div style="height: 5px;"></div>
+    <input type="email" id="eth_amount" class="form-control" placeholder="amount" style="color: black">
+    </div>
+    <br><br>
+    <p class="lead">
+      <a id="eth_send" href="#" class="btn btn-lg btn-secondary">Transact Now</a>
+    </p>
+  </main>
+</div>
+
+  <footer class="mastfoot mt-auto">
+    <div class="inner">
+      <p>&copy; 2019 kwu</p>
+    </div>
+  </footer>
+</div>
+<script src="build/js/intlTelInput.js"></script>
+<script>
+  var input = document.querySelector("#phone");
+  window.intlTelInput(input, {
+    dropdownContainer: document.body,
+    placeholderNumberType: "MOBILE",
+    preferredCountries: ['kr', 'sg', 'jp', 'cn', 'us'],
+    utilsScript: "build/js/utils.js",
+  });
+</script>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+  $('#sms_send').hide();
+  $('#sms_code').hide();
+  $('#ticket').hide();
+
+  var ticket;
+  var chk_ticket = true;
+
+  $('#atcg_send').click(function() {
+    if($('#atcg_to').val() == "" || $('#atcg_amount').val() == "" || $('#phone').val() == "" || $('#sms_code').val() == "") {
+      console.log("err");
+      alert("Please fill all input fields.");
+    } else {
+      $.ajax({
+          url: "http://wallet.kwu.co.kr:5000/wallet/atcg/transfer",
+          type: 'post',
+          headers: {
+              Authorization: "Bearer " + sessionStorage.accessToken
+          },
+          data: {
+            'to': $('#atcg_to').val(),
+            'amount': $('#atcg_amount').val(),
+            'code': $('#sms_code').val(),
+            'ticket': $('#ticket').val()
+          },
+          dataType: 'json',
+          success: function (data) {
+            alert(data.msg);
+          }
+      });
+    }
+  });
+
+  $('#eth_send').click(function() {
+    if($('#eth_to').val() == "" || $('#eth_amount').val() == "") {
+      console.log("err");
+      alert("Please fill all input fields.");
+    } else {
+      $.ajax({
+          url: "http://wallet.kwu.co.kr:5000/wallet/eth/transfer",
+          type: 'post',
+          headers: {
+              Authorization: "Bearer " + sessionStorage.accessToken
+          },
+          data: {
+            'to': $('#eth_to').val(),
+            'amount': $('#eth_amount').val()
+          },
+          dataType: 'json',
+          success: function (data) {
+            alert(data.msg);
+          }
+      });
+    }
+  });
+
+  $('#phone').click(function() {
+    if (chk_ticket) {
+      $('#sms_send').show();
+      $('#sms_send_spacer').show();
+      chk_ticket = !chk_ticket;
+    }
+  });
+
+  $('#sms_send').click(function() {
+    if ($('#phone').val() == "") {
+      console.log('err');
+      alert('fill out your phone number');
+    } else {
+      $('#sms_send').hide();
+      $('#sms_code').show();
+
+      var tel = /\+[\d]*/g.exec($('.iti__selected-flag').attr('title')) + $('#phone').val()
+
+      $.ajax({
+        url: "http://wallet.kwu.co.kr:5000/auth/sms/get",
+        type: 'post',
+        headers: {
+            Authorization: "Bearer " + sessionStorage.accessToken
+        },
+        data: {
+          'tel': tel
+        },
+        dataType: 'json',
+        success: function (data) {
+          $('#ticket').val(data.ticket);
+          alert(data.msg);
+        }
+      });
+    }
+  });
+</script>
+</html>

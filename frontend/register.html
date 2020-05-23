@@ -1,0 +1,99 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>kwu</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/sign-in/">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="build/css/intlTelInput.css">
+
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      a {
+        text-decoration:none !important;
+        color: #0e0e0e;
+      }
+      .small {
+        height: 5px;
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="signin.css" rel="stylesheet">
+  </head>
+  <body class="text-center">
+    <div class="form-signin">
+  <img class="mb-4" src="logo.png" alt="">
+  <label for="inputEmail" class="sr-only">Email address</label>
+  <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+  <label for="inputPassword" class="sr-only">Password</label>
+  <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+
+  <input id="phone" name="phone" class="form-control" type="tel">
+  <div style="height: 7px;"></div>
+  <label for="inputWallet" class="sr-only">Wallet address</label>
+  <p><i>If you join our airdrop promotion, please fill out your correct information.<br>6We prohibit modification of any values.</i></p>
+  <input type="text" id="inputWallet" class="form-control" placeholder="(option) Airdrop Wallet address">
+  <br>
+  <button id="btn_register" class="btn btn-lg btn-primary btn-block" type="submit">회원가입</button>
+  <div class="small"> </div>
+  <p>이미 회원이 이십니까? <a href="login.html">로그인</a></p>
+  <p class="mt-5 mb-3 text-muted">&copy; 2019 kwu</p>
+    </div>
+
+<script src="build/js/intlTelInput.js"></script>
+<script>
+  var input = document.querySelector("#phone");
+  window.intlTelInput(input, {
+    dropdownContainer: document.body,
+    placeholderNumberType: "MOBILE",
+    preferredCountries: ['kr', 'sg', 'jp', 'cn', 'us'],
+    utilsScript: "build/js/utils.js",
+  });
+</script>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+  $('#btn_register').click(function() {
+    if($('#inputEmail').val() == "" || $('#inputPassword').val() == "" || $('#phone').val() == "") {
+      console.log('err');
+    } else {
+      var tel = /\+[\d]*/g.exec($('.iti__selected-flag').attr('title')) + $('#phone').val()
+      $.post("http://wallet.kwu.co.kr:5000/auth/register", {
+        email: $('#inputEmail').val(),
+        password: $('#inputPassword').val(),
+        phone: tel,
+        airdrop: $('#inputWallet').val()
+      }, function(data) {
+        if (data.success == true) {
+          sessionStorage.accessToken = data.accessToken;
+          sessionStorage.wallet = data.wallet;
+          window.location.href = "index.html";
+        } else {
+          alert(data.msg);
+        }
+        console.log(data);
+      }, "json");
+    }
+  });
+</script>
+</html>

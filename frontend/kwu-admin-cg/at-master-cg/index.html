@@ -1,0 +1,98 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>kwu</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/cover/">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="integrity" crossorigin="anonymous">
+
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="cover.css" rel="stylesheet">
+
+    <script>
+        if (sessionStorage.accessToken == null) {
+            window.location.href = "login.html"
+        }
+    </script>
+  </head>
+  <body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="masthead mb-auto">
+    <div class="inner">
+      <h3 class="masthead-brand">kwu Master Panel</h3>
+      <nav class="nav nav-masthead justify-content-center">
+        <a id="deposit" class="nav-link active" href="index.html">New Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main role="main" class="inner cover">
+    <h3 class="cover-heading">Create new admin</h3>
+    <br>
+    <div class="lead" style="display:inline-block;">
+      <input type="email" id="admin_email" class="form-control" placeholder="email">
+      <div style="height: 5px;"></div>
+      <input type="password" id="admin_password" class="form-control" placeholder="password">
+      <div style="height: 5px;"></div>
+      <input type="text" id="admin_limit_amount" class="form-control" placeholder="limit amount">
+    </div>
+    <br>
+    <br>
+    <p id="copy_address_1" class="lead">
+        <a id="btn_copy_address" href="#" class="btn btn-lg btn-secondary">Make new admin</a>
+    </p>
+  </main>
+
+  <footer class="mastfoot mt-auto">
+    <div class="inner">
+      <p>&copy; 2019 kwu</p>
+    </div>
+  </footer>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    $('#btn_copy_address').click(function () {
+      $.ajax({
+        url: "http://wallet.kwu.co.kr:5000/admin/user/register",
+        type: 'post',
+        headers: {
+            Authorization: "Bearer " + sessionStorage.accessToken
+        },
+        data: {
+          'email': $('#admin_email').val(),
+          'password': $('#admin_password').val(),
+          'amount': $('#admin_limit_amount').val()
+        },
+        dataType: 'json',
+        success: function (data) {
+          alert(data.msg);
+        }
+      });
+    });
+</script>
+</html>

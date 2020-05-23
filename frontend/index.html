@@ -1,0 +1,142 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>kwu</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/cover/">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="cover.css" rel="stylesheet">
+
+    <script>
+        if (sessionStorage.accessToken == null) {
+            window.location.href = "login.html"
+        }
+    </script>
+  </head>
+  <body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="masthead mb-auto">
+    <div class="inner">
+      <h3 class="masthead-brand">kwu Wallet</h3>
+      <nav class="nav nav-masthead justify-content-center">
+        <a id="deposit" class="nav-link active" href="index.html">Deposit</a>
+        <a id="withdraw" class="nav-link" href="withdraw.html">Withdraw</a>
+      </nav>
+    </div>
+  </header>
+
+  <main role="main" class="inner cover">
+    <h3 class="cover-heading">ETH/ATCG Wallet</h3>
+    <script>
+        document.write('<img id="copy_address_5" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+sessionStorage.wallet+'" frameborder="0">');
+    </script>
+    <br>
+    <br>
+    <p id="copy_address_2" class="lead" style="font-size: 9pt;"></p>
+    <p id="copy_address_3" class="lead">0.0 ETH</p>
+    <p id="copy_address_4" class="lead">0.0 ATCG</p>
+    <p id="get_my_wallet" class="lead">
+      <a id="btn_get_my_wallet" href="#" class="btn btn-lg btn-secondary">Get my wallet</a>
+    </p>
+    <p id="copy_address_1" class="lead">
+        <a id="btn_copy_address" href="#" class="btn btn-lg btn-secondary">Copy address</a>
+    </p>
+  </main>
+
+  <footer class="mastfoot mt-auto">
+    <p>If you wanna logout? <u><a onclick="logout();">Logout</a></u></p>
+    <div class="inner">
+      <p>&copy; 2019 kwu</p>
+    </div>
+  </footer>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+  function logout() {
+    sessionStorage.clear();
+    location.reload();
+  }
+
+    function copyToClipboard(val) {
+        var t = document.createElement("textarea");
+        document.body.appendChild(t);
+        t.value = val;
+        t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
+    }
+
+    $('#btn_copy_address').click(function () {
+        copyToClipboard(sessionStorage.wallet);
+        alert("Copied!");
+    });
+
+    $('#copy_address_5').click(function() {
+        window.open("https://etherscan.io/address/" + sessionStorage.wallet, '_blank').focus();
+    });
+
+    if (sessionStorage.wallet == "") {
+        $('#copy_address_1').hide();
+        $('#copy_address_2').hide();
+        $('#copy_address_3').hide();
+        $('#copy_address_4').hide();
+        $('#copy_address_5').hide();
+    } else {
+        $('#get_my_wallet').hide();
+        $('#copy_address_2').text(sessionStorage.wallet);
+        $.ajax({
+            url: "http://wallet.kwu.co.kr:5000/wallet/balance",
+            type: 'post',
+            headers: {
+                Authorization: "Bearer " + sessionStorage.accessToken
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#copy_address_3').text(data.eth * 1 + " ETH");
+                $('#copy_address_4').text(data.atcg * 1 + " ATCG");
+            }
+        });
+    }
+
+    $('#btn_get_my_wallet').click(function() {
+        $.ajax({
+            url: "http://wallet.kwu.co.kr:5000/wallet/new",
+            type: 'post',
+            headers: {
+                Authorization: "Bearer " + sessionStorage.accessToken
+            },
+            dataType: 'json',
+            success: function (data) {
+                sessionStorage.wallet = data.wallet;
+                window.location.reload('index.html');
+            }
+        });
+    });
+</script>
+</html>

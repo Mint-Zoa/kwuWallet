@@ -1,0 +1,150 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>s</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/cover/">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      table {
+        border: 1px solid bisque;
+      }
+      td, th {
+        padding: 10px;
+        border: 1px solid beige;
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="cover.css" rel="stylesheet">
+
+    <script>
+        if (sessionStorage.accessToken == null) {
+            window.location.href = "login.html"
+        }
+    </script>
+  </head>
+  <body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="masthead mb-auto">
+    <div class="inner">
+      <h3 class="masthead-brand">s Wallet Admin</h3>
+      <nav class="nav nav-masthead justify-content-center">
+        <a id="deposit" class="nav-link active" href="index.html">Transfer Accept</a>
+        <a id="deposit" class="nav-link" href="user_list.html">User List</a>
+      </nav>
+    </div>
+  </header>
+  <main role="main" class="inner cover">
+
+    <h3 class="cover-heading">Pending list</h3>
+    <br>
+
+    <table id="table" style="width: 100%; overflow:auto;">
+      <tr>
+        <th>ticket</th>
+        <th>user</th>
+        <th>amount</th>
+        <th>Accpet</th>
+        <th>Deny</th>
+      </tr>
+    </table>
+  </main>
+
+
+  <footer class="mastfoot mt-auto">
+    <div class="inner">
+      <p>&copy; 2019 s</p>
+    </div>
+  </footer>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    $.ajax({
+        url: "http://wallet.s.co.kr:5000/admin/transfer/pending/list ",
+        type: 'post',
+        headers: {
+            Authorization: "Bearer " + sessionStorage.accessToken
+        },
+        dataType: 'json',
+        success: function (data) {
+            console.log(data.msg);
+            var pending_list=JSON.parse(data.data).data;
+            pending_list.forEach(pending_element => {
+              var element = `
+                <tr>
+                  <td>` + pending_element.pk + `</td>
+                  <td>` + pending_element.email + `</td>
+                  <td>` + pending_element.amount + `</td>
+                  <td><button onclick="VerifyPending('` + pending_element.pk + `')">Accept</button></td>
+                  <td><button onclick="DenyPending('` + pending_element.pk + `')">Deny</button></td>
+                </tr>`
+              $('#table').append(element);
+            });
+        }
+    });
+
+    function VerifyPending(pk) {
+      if (confirm('Ticket Pending Verify Accept')) {
+        $.ajax({
+            url: "http://wallet.s.co.kr:5000/admin/transfer/pending/accept",
+            type: 'post',
+            headers: {
+                Authorization: "Bearer " + sessionStorage.accessToken
+            },
+            data: {
+              'pk': pk
+            },
+            dataType: 'json',
+            success: function (data) {
+              alert(data.msg);
+              location.reload();
+            }
+        });
+      }
+    }
+
+    function DenyPending(pk) {
+      if (confirm('Ticket Pending Verify Deny')) {
+        $.ajax({
+            url: "http://wallet.s.co.kr:5000/admin/transfer/pending/deny",
+            type: 'post',
+            headers: {
+                Authorization: "Bearer " + sessionStorage.accessToken
+            },
+            data: {
+              'pk': pk
+            },
+            dataType: 'json',
+            success: function (data) {
+              alert(data.msg);
+              location.reload();
+            }
+        });
+      }
+    }
+</script>
+</html>

@@ -1,0 +1,234 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>kwu</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/cover/">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      table {
+        border: 1px solid bisque;
+      }
+      td, th {
+        padding: 10px;
+        border: 1px solid beige;
+      }
+
+
+    .button {
+        font-size: 1em;
+        padding: 10px;
+        color: #fff;
+        border: 2px solid #06D85F;
+        border-radius: 20px/50px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease-out;
+    }
+    .button:hover {
+        background: #06D85F;
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        transition: opacity 500ms;
+        visibility: hidden;
+        opacity: 0;
+    }
+    .overlay:target {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .popup {
+        margin: 70px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 5px;
+        width: 70%;
+        position: relative;
+        transition: all 5s ease-in-out;
+    }
+
+    .popup h2 {
+        margin-top: 0;
+        color: #333;
+        font-family: Tahoma, Arial, sans-serif;
+    }
+    .content {
+        font-family: Tahoma, Arial, sans-serif;
+        color: #333;
+    }
+    .popup .close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        transition: all 200ms;
+        font-size: 30px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #333;
+    }
+    .popup .close:hover {
+        color: #06D85F;
+    }
+    .popup .content {
+        max-height: 70%;
+        overflow: auto;
+    }
+
+    @media screen and (max-width: 700px){
+        .popup{
+            width: 70%;
+        }
+    }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="cover.css" rel="stylesheet">
+
+    <script>
+        if (sessionStorage.accessToken == null) {
+            window.location.href = "login.html"
+        }
+    </script>
+  </head>
+  <body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="masthead mb-auto">
+    <div class="inner">
+      <h3 class="masthead-brand">kwu Wallet Admin</h3>
+      <nav class="nav nav-masthead justify-content-center">
+        <a id="deposit" class="nav-link" href="index.html">Transfer Accept</a>
+        <a id="deposit" class="nav-link active" href="user_list.html">User List</a>
+      </nav>
+    </div>
+  </header>
+  <main role="main" class="inner cover">
+
+    <h3 class="cover-heading">User list</h3>
+    <br>
+
+    <table id="table" style="width: 100%; overflow:auto;">
+      <tr>
+        <th>email</th>
+        <th>phone</th>
+        <th>detail</th>
+        <th>balance</th>
+      </tr>
+    </table>
+
+    <div id="popup_detail" class="overlay">
+        <div class="popup">
+            <h2>Detail</h2>
+            <a class="close" href="#">&times;</a>
+            <div id="detail_data" class="content">
+            </div>
+        </div>
+    </div>
+
+    <div id="popup_balance" class="overlay">
+        <div class="popup">
+            <h2>Detail</h2>
+            <a class="close" href="#">&times;</a>
+            <div id="balance_data" class="content">
+            </div>
+        </div>
+    </div>
+  </main>
+
+  <footer class="mastfoot mt-auto">
+    <div class="inner">
+      <p>&copy; 2019 kwu</p>
+    </div>
+  </footer>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    var pending_list;
+
+    $.ajax({
+        url: "http://wallet.kwu.co.kr:5000/admin/manage/list ",
+        type: 'post',
+        headers: {
+            Authorization: "Bearer " + sessionStorage.accessToken
+        },
+        dataType: 'json',
+        success: function (data) {
+            console.log(data.msg);
+            pending_list=JSON.parse(data.data).data;
+            for (var i=0; i<pending_list.length; i++) {
+                pending_element = pending_list[i];
+                var element = `
+                <tr>
+                  <td>` + pending_element.email + `</td>
+                  <td>` + pending_element.phone + `</td>
+                  <td><button onclick="showDetail('` + i + `')">Show</button></td>
+                  <td><button href="#popup1" onclick="checkBalance('` + i + `')">Check</button></td>
+                </tr>`
+              $('#table').append(element);
+            }
+        }
+    });
+
+    function showDetail(index) {
+        $('#detail_data').text("");
+        location.href="#popup_detail";
+        var element = 'email : ' + pending_list[index].email
+            + '<br>phone : ' + pending_list[index].phone
+            + '<br>wallet : ' + pending_list[index].wallet
+            + '<br>airdrop : ' + pending_list[index].airdrop;
+        $('#detail_data').append(element);
+    }
+
+    function checkBalance(index) {
+        $.ajax({
+            url: "http://wallet.kwu.co.kr:5000/admin/manage/balance/check",
+            type: 'post',
+            headers: {
+                Authorization: "Bearer " + sessionStorage.accessToken
+            },
+            data: {
+                'email': pending_list[index].email
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#balance_data').text("");
+                alert(data.msg);
+                location.href="#popup_balance"
+                var element = 'eth : ' + data.eth
+                    + '<br>atcg : ' + data.atcg;
+                $('#balance_data').append(element);
+            }
+        });
+    }
+</script>
+</html>
